@@ -89,6 +89,7 @@
         <Compile Include="Compatibility\ModCompat.cs" />
         <Compile Include="Compatibility\WardIsLove\WardIsLovePlugin.cs" />
         <Compile Include="Compatibility\WardIsLove\WardMonoscript.cs" />
+        <Compile Include="VersionHandshake.cs" />
         <Compile Include="WhereYouAt.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>

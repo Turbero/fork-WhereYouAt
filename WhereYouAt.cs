@@ -13,11 +13,13 @@ namespace WhereYouAt
 
     {
         internal const string ModName = "WhereYouAt";
-        internal const string ModVersion = "1.0.0";
+        internal const string ModVersion = "1.0.2";
         internal const string Author = "Azumatt";
         private const string ModGUID = Author + "." + ModName;
         private static string ConfigFileName = ModGUID + ".cfg";
         private static string ConfigFileFullPath = Paths.ConfigPath + Path.DirectorySeparatorChar + ConfigFileName;
+        
+        internal static string ConnectionError = "";
 
         private readonly Harmony _harmony = new(ModGUID);
 
@@ -130,51 +132,6 @@ namespace WhereYouAt
                     Toggle.On when _insideWard => false,
                     _ => true
                 };
-            }
-        }
-
-
-        /* Version Handshake stuffs */
-
-        /* Server */
-        [HarmonyPatch(typeof(Version), nameof(Version.GetVersionString))]
-        private static class PatchVersionGetVersionString
-        {
-            [HarmonyPriority(Priority.Last)]
-            private static void Postfix(ref string __result)
-            {
-                if (ZNet.instance?.IsServer() == true)
-                {
-                    __result += "-WhereYouAt";
-                }
-            }
-        }
-
-        /* Shared */
-        [HarmonyPatch(typeof(ZNet), nameof(ZNet.RPC_PeerInfo))]
-        private static class PatchZNetRPC_PeerInfo
-        {
-            [HarmonyPriority(Priority.Last)]
-            private static void Prefix(ref ZPackage pkg)
-            {
-                long uid = pkg.ReadLong();
-                string versionString = pkg.ReadString();
-
-                if (ZNet.instance.IsServer())
-                {
-                    versionString += "-WhereYouAt";
-                }
-                else
-                {
-                    versionString = versionString.Replace("-WhereYouAt", "");
-                }
-
-                ZPackage newPkg = new();
-                newPkg.Write(uid);
-                newPkg.Write(versionString);
-                newPkg.m_writer.Write(pkg.m_reader.ReadBytes((int)(pkg.m_stream.Length - pkg.m_stream.Position)));
-                pkg = newPkg;
-                pkg.SetPos(0);
             }
         }
 
