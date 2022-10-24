@@ -50,7 +50,11 @@ public class WhereYouAtVersionHandshake
         private static void Postfix(FejdStartup __instance)
         {
             if (__instance.m_connectionFailedPanel.activeSelf)
+            {
+                __instance.m_connectionFailedError.resizeTextMaxSize = 25;
+                __instance.m_connectionFailedError.resizeTextMinSize = 15;
                 __instance.m_connectionFailedError.text += "\n" + WhereYouAtPlugin.ConnectionError;
+            }
         }
     }
 
