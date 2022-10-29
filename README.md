@@ -63,6 +63,8 @@ For Questions or Comments, find me in the Odin Plus Team Discord or in mine:
 <a href="https://discord.gg/pdHgy6Bsng"><img src="https://i.imgur.com/Xlcbmm9.png" href="https://discord.gg/pdHgy6Bsng" width="175" height="175"></a>
 ***
 > # Update Information (Latest listed first)
+> > ### v1.0.6
+> - Update ServerySync internally
 > ### v1.0.5
 > - Update ServerySync internally
 > - Update WIL compatibility naming for new GUID.
