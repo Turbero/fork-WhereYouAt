@@ -117,7 +117,7 @@ namespace WhereYouAt
                 {
                     _insideWard = WardIsLovePlugin.IsLoaded()
                         ? WardMonoscript.InsideWard(Player.m_localPlayer.transform.position)
-                        : PrivateArea.CheckInPrivateArea(Player.m_localPlayer.transform.position);
+                        : PrivateArea.InsideFactionArea(Player.m_localPlayer.transform.position, Character.Faction.Players);
                 }
 
                 if (_adminExempt.Value == Toggle.On && ConfigSync.IsAdmin)
