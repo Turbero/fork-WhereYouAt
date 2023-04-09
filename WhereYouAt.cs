@@ -13,7 +13,7 @@ namespace WhereYouAt
 
     {
         internal const string ModName = "WhereYouAt";
-        internal const string ModVersion = "1.0.7";
+        internal const string ModVersion = "1.0.8";
         internal const string Author = "Azumatt";
         private const string ModGUID = Author + "." + ModName;
         private static string ConfigFileName = ModGUID + ".cfg";
@@ -81,6 +81,26 @@ namespace WhereYouAt
                 WhereYouAtLogger.LogError("Please check your config entries for spelling and format!");
             }
         }
+        
+        private static void UpdateInsideWard()
+        {
+            if (Player.m_localPlayer != null)
+            {
+                _insideWard = WardIsLovePlugin.IsLoaded()
+                    ? WardMonoscript.InsideWard(Player.m_localPlayer.transform.position)
+                    : PrivateArea.InsideFactionArea(Player.m_localPlayer.transform.position, Character.Faction.Players);
+            }
+        }
+
+        private static bool CheckOffInWardValue()
+        {
+            return _offInWards.Value switch
+            {
+                Toggle.Off => true,
+                Toggle.On when _insideWard => false,
+                _ => true
+            };
+        }
 
         #region HarmonyPatches
 
@@ -93,16 +113,10 @@ namespace WhereYouAt
                 {
                     return;
                 }
-
-                if (Player.m_localPlayer == null) return;
+                
                 if (_preventPublicToggle.Value == Toggle.On)
                 {
-                    ___m_publicReferencePosition = _offInWards.Value switch
-                    {
-                        Toggle.Off => true,
-                        Toggle.On when _insideWard => false,
-                        _ => true
-                    };
+                    ___m_publicReferencePosition = CheckOffInWardValue();
                 }
             }
         }
@@ -113,12 +127,7 @@ namespace WhereYouAt
             static void Postfix(Minimap __instance)
             {
                 if (!__instance) return;
-                if (Player.m_localPlayer != null)
-                {
-                    _insideWard = WardIsLovePlugin.IsLoaded()
-                        ? WardMonoscript.InsideWard(Player.m_localPlayer.transform.position)
-                        : PrivateArea.InsideFactionArea(Player.m_localPlayer.transform.position, Character.Faction.Players);
-                }
+                UpdateInsideWard();
 
                 if (_adminExempt.Value == Toggle.On && ConfigSync.IsAdmin)
                 {
@@ -126,12 +135,25 @@ namespace WhereYouAt
                 }
 
                 if (_preventPublicToggle.Value != Toggle.On) return;
-                __instance.m_publicPosition.isOn = _offInWards.Value switch
+                __instance.m_publicPosition.isOn = CheckOffInWardValue();
+            }
+        }
+
+        [HarmonyPatch(typeof(Player), nameof(Player.OnSpawned))]
+        static class PlayerOnSpawnedPatch
+        {
+            static void Postfix(Player __instance)
+            {
+                UpdateInsideWard();
+
+                if (_adminExempt.Value == Toggle.On && ConfigSync.IsAdmin)
                 {
-                    Toggle.Off => true,
-                    Toggle.On when _insideWard => false,
-                    _ => true
-                };
+                    return;
+                }
+
+                if (_preventPublicToggle.Value != Toggle.On) return;
+                bool shouldSet = CheckOffInWardValue();
+                ZNet.instance.SetPublicReferencePosition(shouldSet);
             }
         }
 

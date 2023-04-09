@@ -79,6 +79,6 @@ For Questions or Comments, find me in the Odin Plus Team Discord or in mine:
 > ### v1.0.2
 > - Version string issue fix.
 > ### v1.0.1
-> - Attempt at fixing verison string load.
+> - Attempt at fixing version string load.
 > ### v1.0.0
 > - Initial Release
