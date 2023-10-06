@@ -1,5 +1,6 @@
 > # (Latest listed first)
->
+> ### v1.0.9
+> - Update for Valheim 0.217.22
 > ### v1.0.8
 > - Update some internal code. Should help with some issues.
 > ### v1.0.7

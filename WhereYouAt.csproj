@@ -53,36 +53,39 @@
         </When>
     </Choose>
     <ItemGroup>
-        <Reference Include="0Harmony, Version=2.9.0.0, Culture=neutral, PublicKeyToken=null">
+        <Reference Include="0Harmony">
             <HintPath>$(GamePath)\BepInEx\core\0Harmony.dll</HintPath>
         </Reference>
-        <Reference Include="assembly_guiutils, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <Reference Include="assembly_guiutils">
             <HintPath>$(GamePath)\valheim_Data\Managed\publicized_assemblies\assembly_guiutils_publicized.dll</HintPath>
         </Reference>
-        <Reference Include="assembly_utils, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <Reference Include="assembly_utils">
             <HintPath>$(GamePath)\valheim_Data\Managed\publicized_assemblies\assembly_utils_publicized.dll</HintPath>
         </Reference>
-        <Reference Include="assembly_valheim, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <Reference Include="assembly_valheim">
             <HintPath>$(GamePath)\valheim_Data\Managed\publicized_assemblies\assembly_valheim_publicized.dll</HintPath>
         </Reference>
         <Reference Include="BepInEx">
             <HintPath>$(GamePath)\BepInEx\core\BepInEx.dll</HintPath>
         </Reference>
-        <Reference Include="ServerSync, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <Reference Include="ServerSync">
             <HintPath>Libs\ServerSync.dll</HintPath>
         </Reference>
         <Reference Include="System" />
         <Reference Include="System.Core" />
         <Reference Include="System.Data" />
         <Reference Include="System.Xml" />
-        <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <Reference Include="UnityEngine">
             <HintPath>$(GamePath)\unstripped_corlib\UnityEngine.dll</HintPath>
         </Reference>
-        <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <Reference Include="UnityEngine.CoreModule">
             <HintPath>$(GamePath)\unstripped_corlib\UnityEngine.CoreModule.dll</HintPath>
         </Reference>
-        <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <Reference Include="UnityEngine.UI">
             <HintPath>$(GamePath)\unstripped_corlib\UnityEngine.UI.dll</HintPath>
+        </Reference>
+        <Reference Include="Unity.TextMeshPro">
+            <HintPath>$(GamePath)\valheim_Data\Managed\Unity.TextMeshPro.dll</HintPath>
         </Reference>
     </ItemGroup>
     <ItemGroup>
@@ -144,7 +147,7 @@
         </PropertyGroup>
     </Target>
     <Target Name="Copy" AfterTargets="GetAssemblyVersion">
-        <Exec Command="copy /Y &quot;$(TargetDir)$(AssemblyName).dll&quot; &quot;C:\Users\crypt\AppData\Roaming\r2modmanPlus-local\Valheim\profiles\PTB\BepInEx\plugins\_TESTINGMODS\$(AssemblyName).dll&quot;" />
+        <!--<Exec Command="copy /Y &quot;$(TargetDir)$(AssemblyName).dll&quot; &quot;C:\Users\crypt\AppData\Roaming\r2modmanPlus-local\Valheim\profiles\PTB\BepInEx\plugins\_TESTINGMODS\$(AssemblyName).dll&quot;" />-->
         <Exec Command="copy /Y &quot;README.md&quot; &quot;Thunderstore\README.md&quot;" />
     </Target>
     <Target Name="UpdateManifestVersion" AfterTargets="Copy" Condition="'$(OS)' == 'Windows_NT'">
