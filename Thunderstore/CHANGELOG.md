@@ -1,4 +1,6 @@
 > # (Latest listed first)
+> ### v1.0.12
+> - Added new option for specific biomes rules in configuration file
 > ### v1.0.11
 > - Update ServerSync internally
 > ### v1.0.10

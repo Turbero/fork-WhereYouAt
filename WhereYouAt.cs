@@ -50,7 +50,7 @@ namespace WhereYouAt
                     "If any value, apply the position sharing rule for specific biomes in this list."));
             _onOffInBiomesRule = config("1 - General", "On/Off In Biomes Rule", PositionSharingRule.Free,
                 new ConfigDescription(
-                    "If any value in biomes list, set up the position sharing rule in those specific biomes."));
+                    "If any value in biomes list, set up the position sharing rule in those specific biomes. Possible values: Show,Hide,Free."));
 
             _harmony.PatchAll();
             SetupWatcher();

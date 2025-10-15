@@ -21,6 +21,12 @@ A server and client side mod to force show position on the map. Can join servers
 * Off In Wards [Synced with Server]
   * If on, hide position sharing in wards. NOTE: This will force position to toggle off and stay off while inside a ward.
     * Default value: Off
+* On/Off In Biomes List [Synced with Server]
+  * If any value, apply the position sharing rule for specific biomes in this list.
+    * Default value: (empty)
+* On/Off In Biomes Rule [Synced with Server]
+  * If any value in biomes list, set up the position sharing rule in those specific biomes. Possible values: Show,Hide,Free.
+    * Default value: Show
 
 
 > ## Installation Instructions
