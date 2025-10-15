@@ -45,9 +45,12 @@ namespace WhereYouAt
             _offInWards = config("1 - General", "Off In Wards", Toggle.Off,
                 new ConfigDescription(
                     "If on, hide position sharing in wards. NOTE: This will force position to toggle off and stay off while inside a ward."));
-            _offInBiomes = config("1 - General", "Off In Biomes", "",
+            _onOffInBiomes = config("1 - General", "On/Off In Biomes List", "",
                 new ConfigDescription(
-                    "If any value, hide position sharing in the specific biomes. NOTE: This will force position to toggle off and stay off while in the biome."));
+                    "If any value, apply the position sharing rule for specific biomes in this list."));
+            _onOffInBiomesRule = config("1 - General", "On/Off In Biomes Rule", PositionSharingRule.Free,
+                new ConfigDescription(
+                    "If any value in biomes list, set up the position sharing rule in those specific biomes."));
 
             _harmony.PatchAll();
             SetupWatcher();
@@ -106,7 +109,7 @@ namespace WhereYouAt
         
         private static bool CheckOffInBiomesValue(Heightmap.Biome biome)
         {
-            return _offInBiomes.Value.Contains(biome.ToString());
+            return _onOffInBiomes.Value.Contains(biome.ToString());
         }
 
         #region HarmonyPatches
@@ -123,7 +126,10 @@ namespace WhereYouAt
                 
                 if (CheckOffInBiomesValue(EnvMan.instance.GetCurrentBiome()))
                 {
-                    ___m_publicReferencePosition = false;
+                    if (_onOffInBiomesRule.Value != PositionSharingRule.Free)
+                    {
+                        ___m_publicReferencePosition = _onOffInBiomesRule.Value == PositionSharingRule.Show;
+                    }
                     return;
                 }
                 
@@ -149,7 +155,10 @@ namespace WhereYouAt
                 
                 if (CheckOffInBiomesValue(__instance.m_biome))
                 {
-                    __instance.m_publicPosition.isOn = false;
+                    if (_onOffInBiomesRule.Value != PositionSharingRule.Free)
+                    {
+                        __instance.m_publicPosition.isOn = _onOffInBiomesRule.Value == PositionSharingRule.Show;
+                    }
                     return;
                 }
 
@@ -172,42 +181,16 @@ namespace WhereYouAt
                 
                 if (CheckOffInBiomesValue(__instance.GetCurrentBiome()))
                 {
-                    ZNet.instance.m_publicReferencePosition = false;
+                    if (_onOffInBiomesRule.Value != PositionSharingRule.Free)
+                    {
+                        ZNet.instance.m_publicReferencePosition = _onOffInBiomesRule.Value == PositionSharingRule.Show;
+                    }
                     return;
                 }
 
                 if (_preventPublicToggle.Value != Toggle.On) return;
                 bool shouldSet = CheckOffInWardValue();
                 ZNet.instance.m_publicReferencePosition = shouldSet;
-            }
-        }
-        
-        [HarmonyPatch(typeof(EnvMan), "UpdateEnvironment")]
-        public static class BiomeChangePatch
-        {
-            private static Heightmap.Biome previousBiome = Heightmap.Biome.None;
-
-            public static void Postfix(long sec, Heightmap.Biome biome)
-            {
-                if (biome != previousBiome)
-                {
-                    previousBiome = biome;
-                    
-                    if (_adminExempt.Value == Toggle.On && ConfigSync.IsAdmin)
-                    {
-                        return;
-                    }
-                
-                    if (CheckOffInBiomesValue(biome))
-                    {
-                        ZNet.instance.m_publicReferencePosition = false;
-                        return;
-                    }
-
-                    if (_preventPublicToggle.Value != Toggle.On) return;
-                    bool shouldSet = CheckOffInWardValue();
-                    ZNet.instance.m_publicReferencePosition = shouldSet;
-                }
             }
         }
 
@@ -220,7 +203,8 @@ namespace WhereYouAt
         private static ConfigEntry<Toggle> _preventPublicToggle = null!;
         private static ConfigEntry<Toggle> _adminExempt = null!;
         private static ConfigEntry<Toggle> _offInWards = null!;
-        private static ConfigEntry<string> _offInBiomes = null!;
+        private static ConfigEntry<string> _onOffInBiomes = null!;
+        private static ConfigEntry<PositionSharingRule> _onOffInBiomesRule = null!;
 
 
         private ConfigEntry<T> config<T>(string group, string name, T value, ConfigDescription description,
@@ -268,6 +252,13 @@ namespace WhereYouAt
         {
             On = 1,
             Off = 0
+        }
+        
+        public enum PositionSharingRule
+        {
+            Hide = 0,
+            Show = 1,
+            Free = 2
         }
 
         #endregion
