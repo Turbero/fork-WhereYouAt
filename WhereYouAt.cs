@@ -13,7 +13,7 @@ namespace WhereYouAt
 
     {
         internal const string ModName = "WhereYouAt";
-        internal const string ModVersion = "1.0.11";
+        internal const string ModVersion = "1.0.12";
         internal const string Author = "Azumatt";
         private const string ModGUID = Author + "." + ModName;
         private static string ConfigFileName = ModGUID + ".cfg";
@@ -45,7 +45,9 @@ namespace WhereYouAt
             _offInWards = config("1 - General", "Off In Wards", Toggle.Off,
                 new ConfigDescription(
                     "If on, hide position sharing in wards. NOTE: This will force position to toggle off and stay off while inside a ward."));
-
+            _offInBiomes = config("1 - General", "Off In Biomes", "",
+                new ConfigDescription(
+                    "If any value, hide position sharing in the specific biomes. NOTE: This will force position to toggle off and stay off while in the biome."));
 
             _harmony.PatchAll();
             SetupWatcher();
@@ -101,6 +103,11 @@ namespace WhereYouAt
                 _ => true
             };
         }
+        
+        private static bool CheckOffInBiomesValue(Heightmap.Biome biome)
+        {
+            return _offInBiomes.Value.Contains(biome.ToString());
+        }
 
         #region HarmonyPatches
 
@@ -111,6 +118,12 @@ namespace WhereYouAt
             {
                 if (_adminExempt.Value == Toggle.On && ConfigSync.IsAdmin)
                 {
+                    return;
+                }
+                
+                if (CheckOffInBiomesValue(EnvMan.instance.GetCurrentBiome()))
+                {
+                    ___m_publicReferencePosition = false;
                     return;
                 }
                 
@@ -133,6 +146,12 @@ namespace WhereYouAt
                 {
                     return;
                 }
+                
+                if (CheckOffInBiomesValue(__instance.m_biome))
+                {
+                    __instance.m_publicPosition.isOn = false;
+                    return;
+                }
 
                 if (_preventPublicToggle.Value != Toggle.On) return;
                 __instance.m_publicPosition.isOn = CheckOffInWardValue();
@@ -150,10 +169,45 @@ namespace WhereYouAt
                 {
                     return;
                 }
+                
+                if (CheckOffInBiomesValue(__instance.GetCurrentBiome()))
+                {
+                    ZNet.instance.m_publicReferencePosition = false;
+                    return;
+                }
 
                 if (_preventPublicToggle.Value != Toggle.On) return;
                 bool shouldSet = CheckOffInWardValue();
-                ZNet.instance.SetPublicReferencePosition(shouldSet);
+                ZNet.instance.m_publicReferencePosition = shouldSet;
+            }
+        }
+        
+        [HarmonyPatch(typeof(EnvMan), "UpdateEnvironment")]
+        public static class BiomeChangePatch
+        {
+            private static Heightmap.Biome previousBiome = Heightmap.Biome.None;
+
+            public static void Postfix(long sec, Heightmap.Biome biome)
+            {
+                if (biome != previousBiome)
+                {
+                    previousBiome = biome;
+                    
+                    if (_adminExempt.Value == Toggle.On && ConfigSync.IsAdmin)
+                    {
+                        return;
+                    }
+                
+                    if (CheckOffInBiomesValue(biome))
+                    {
+                        ZNet.instance.m_publicReferencePosition = false;
+                        return;
+                    }
+
+                    if (_preventPublicToggle.Value != Toggle.On) return;
+                    bool shouldSet = CheckOffInWardValue();
+                    ZNet.instance.m_publicReferencePosition = shouldSet;
+                }
             }
         }
 
@@ -166,6 +220,7 @@ namespace WhereYouAt
         private static ConfigEntry<Toggle> _preventPublicToggle = null!;
         private static ConfigEntry<Toggle> _adminExempt = null!;
         private static ConfigEntry<Toggle> _offInWards = null!;
+        private static ConfigEntry<string> _offInBiomes = null!;
 
 
         private ConfigEntry<T> config<T>(string group, string name, T value, ConfigDescription description,
